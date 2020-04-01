@@ -9,6 +9,10 @@ from matplotlib import pyplot as plt
 from IPython import display
 
 #os.chdir('/users/pgrad/mohanni/demo/ai_gan')
+train_img_path='/users/pgrad/mohanni/demo/ai_gan/landscapes_processed/join_train'
+test_img_path='/users/pgrad/mohanni/demo/ai_gan/landscapes_processed/join_test'
+model_name='ai_gan/models/landscapes.h5'
+
 
 BUFFER_SIZE = 400
 BATCH_SIZE = 1
@@ -83,13 +87,13 @@ def load_image_test(image_file):
  
    return input_image, real_image
   
-train_dataset = tf.data.Dataset.list_files('ai_gan/join_train/*.jpg')
+train_dataset = tf.data.Dataset.list_files(train_img_path+'/*.jpg')
 train_dataset = train_dataset.map(load_image_train,
                                   num_parallel_calls=tf.data.experimental.AUTOTUNE)
 train_dataset = train_dataset.shuffle(BUFFER_SIZE)
 train_dataset = train_dataset.batch(BATCH_SIZE)
 
-test_dataset = tf.data.Dataset.list_files('ai_gan/join_test/*.jpg')
+test_dataset = tf.data.Dataset.list_files(test_img_path+'/*.jpg')
 test_dataset = test_dataset.map(load_image_test)
 test_dataset = test_dataset.batch(BATCH_SIZE)
 
@@ -282,7 +286,7 @@ def generate_images_orig(model, test_input, tar):
 for example_input, example_target in test_dataset.take(1):
   generate_images(generator, example_input, example_target,110)
   
-EPOCHS = 3
+EPOCHS = 5
 
 import datetime
 log_dir="ai_gan/logs/"
@@ -341,14 +345,14 @@ def fit(train_ds, epochs, test_ds):
     if (epoch + 1) % 20 == 0:
       checkpoint.save(file_prefix = checkpoint_prefix)
 
-    generator.save('ai_gan/models/mymodel_v2.h5')
+    generator.save(model_name)
 
     print ('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                         time.time()-start))
   checkpoint.save(file_prefix = checkpoint_prefix)
 
 fit(train_dataset, EPOCHS, test_dataset)
-generator.save('ai_gan/models/mymodel_v2.h5')
+generator.save('ai_gan/models/mymodel_v3.h5')
 #for inp, tar in test_dataset.take(5):
 #  generate_images(generator, inp, tar)
   
